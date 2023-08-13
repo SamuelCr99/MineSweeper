@@ -18,7 +18,7 @@ def create_board():
     random_numbers = random.sample(range(0, 99), 10)
     for i in range(10):
         board.append([])
-        for j in range(10):
+        for _ in range(10):
             count += 1
             if count in random_numbers:
                 board[i].append(11)
@@ -59,6 +59,19 @@ def calculate_bombs(board, x, y):
                     count += 1
     return count
 
+def find_more_zeros(board, x, y):
+    if x+1 < 10 and board[x+1][y] == 10 and calculate_bombs(board, x+1, y) == 0:
+        board[x+1][y] = 0
+        find_more_zeros(board, x+1, y)
+    if y+1 < 10 and board[x][y+1] == 10 and calculate_bombs(board, x, y+1) == 0:
+        board[x][y+1] = 0
+        find_more_zeros(board, x, y+1)
+    if x-1 >= 0 and board[x-1][y] == 10 and calculate_bombs(board, x-1, y) == 0:
+        board[x-1][y] = 0 
+        find_more_zeros(board, x-1, y)
+    if y-1 >= 0 and board[x][y-1] == 10 and calculate_bombs(board, x, y-1) == 0:
+        board[x][y-1] = 0
+        find_more_zeros(board, x, y-1)
 
 
 def main():
@@ -68,7 +81,6 @@ def main():
     # 13 pressed bomb square
 
     board = create_board()
-    real_board = board
     # Main loop
     while True:
         for event in pygame.event.get():
@@ -80,6 +92,8 @@ def main():
                 y_pos = y_pos // 80
                 if board[x_pos][y_pos] == 10:
                     board[x_pos][y_pos] = calculate_bombs(board, x_pos, y_pos)
+                    if board[x_pos][y_pos] == 0: 
+                        find_more_zeros(board, x_pos, y_pos)
                 elif board[x_pos][y_pos] == 11:
                     board[x_pos][y_pos] = 13
                     print('Game over')
